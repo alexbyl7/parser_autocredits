@@ -3,7 +3,9 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 import time
-import csv
+
+import excel
+
 
 def get_html_requests(url):
      headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
@@ -71,19 +73,15 @@ def parse_infinbank():
     print('Парсим сайт Infinbank...', '\n')
 
     url = 'https://www.infinbank.com/ru/private/credits/'
-
     html = get_html_webdriver(url)
     soup = BeautifulSoup(html, 'html.parser')
 
-    r = 0
-    f = open('./data.csv', 'w', encoding='cp1251')
-    writer = csv.writer(f)
-    header = ['№', 'Банки', 'Наименование кредита', 'Процентная ставка', 'Срок кредита', 'Цель кредита']
-    writer.writerow(header)
+    cont = soup.find_all('div', class_='g-container')
 
-    conts = soup.find_all('div', class_='g-container')
+    idx = 1
+    data = []
 
-    for c in conts:
+    for c in cont:
         title = c.find('a', class_='news-preview__link plastic-in-content__link dlink')
         if title is not None:
             percent = ''
@@ -98,60 +96,13 @@ def parse_infinbank():
                 if desc[i].text.find('Срок кредита') >= 0:
                     term = value[i].text;
 
-            data = [1, 'Infinbank', title.text, percent, term, '']
-            writer.writerow(data)
+            s = [idx, 'Infinbank', title.text, percent, term, ' - ']
+            data.append(s)
 
+            idx += 1
             print()
 
-    # close the file
-    f.close()
+    return data
 
-
-
-    # res1=driver.get(url)
-    # button = driver.find_element_by_class_name("slide-out-btn")
-    # button.click()
-
-    # print(res1)
-
-    # html = get_html(url)
-    # price = get_elements(html, 'div', 'catalog-product-min-price__current')
-    # caption = get_elements(html, 'div', 'catalog-product__rating')
-
-    # res = get_elements(html, 'input', 'form-control input-lg')
-    # res = get_elements(html, 'row', 'form-group form-group-lg')
-
-    # print(html)
-
-    # soup = BeautifulSoup(html, 'html.parser')
-    # # res = soup.find_all('div', class_=class_name)
-    # # res = soup.find_all('div', '')
-    # # for link in soup.find_all('p'):
-    # #     print(link)
-    #
-    # res = soup.find_all(class_='flex lg4 xs12');
-    #
-    # print(soup.find_all(class_='flex lg4 xs12'))
-    #
-    # for i in range(len(res)):
-    #     if res[i].get("name") == "LOAN_PERCENT":
-    #         percent = res[i].get("value")
-    #
-    # exit()
-    #
-    # percent = 0;
-    # length = 0;
-    #
-    # for i in range(len(res)):
-    #     if res[i].get("name") == "LOAN_PERCENT":
-    #         percent = res[i].get("value")
-    #     if res[i].get("name") == "LOAN_LENGTH":
-    #         length = res[i].get("value")
-    #
-    # # percent = res[4].get('value')
-    # #.value("LOAN_PERCENT")
-    # # index("LOAN_PERCENT")
-    # print(html)
-    # print("Res =", res)
-    # print("Percent = ", percent)
-    # print("Length = ", length)
+    # excel.export_xls(headers, data)
+    # excel.export_csv(headers, data)

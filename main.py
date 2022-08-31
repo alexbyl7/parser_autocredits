@@ -1,9 +1,19 @@
 import parser
+import excel
 
 if __name__ == '__main__':
-    # print("Test parser by Alex");
+    headers = ['№', 'Банки', 'Наименование кредита', 'Процентная ставка', 'Срок кредита', 'Цель кредита']
+
+    data = []
 
     # parser.parse_ipakyulibank()
     # parser.parse_kapital24()
-    parser.parse_infinbank()
+
+    d = parser.parse_infinbank()
+    for s in d:
+        data.append(s)
+
+    print(data)
+
+    excel.export_xls(headers, data)
 
