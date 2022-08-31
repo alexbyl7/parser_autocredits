@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 import time
-import re
+import csv
 
 def get_html_requests(url):
      headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
@@ -68,25 +68,45 @@ def parse_kapital24():
             print(s)
 
 def parse_infinbank():
-    print("Parse Infinbank")
+    print('Парсим сайт Infinbank...', '\n')
 
-    url = 'https://www.infinbank.com/ru/private/credits/avto_credit_first/'
+    url = 'https://www.infinbank.com/ru/private/credits/'
 
     html = get_html_webdriver(url)
     soup = BeautifulSoup(html, 'html.parser')
 
-    res = soup.find_all('div')
-    # print(res)
-    # exit()
+    r = 0
+    f = open('./data.csv', 'w', encoding='cp1251')
+    writer = csv.writer(f)
+    header = ['№', 'Банки', 'Наименование кредита', 'Процентная ставка', 'Срок кредита', 'Цель кредита']
+    writer.writerow(header)
 
-    for i in range(len(res)):
-        s0 = res[i].getText()
-        if s0.find('Годовая ставка') > 0:
-            s = s0.split('\n')
-            for i_s in range(len(s)):
-                print(s[i_s])
-                if s[i_s].find('Годовая ставка') > 0:
-                    print(i_s, ': ', s[i_s])
+    conts = soup.find_all('div', class_='g-container')
+
+    for c in conts:
+        title = c.find('a', class_='news-preview__link plastic-in-content__link dlink')
+        if title is not None:
+            percent = ''
+            term = ''
+            print(title.text)
+            desc = c.find_all('b', class_='owner-list__title')
+            value = c.find_all('p', class_='owner-list__text')
+            for i in range(len(desc)):
+                print(desc[i].text, ': ', value[i].text)
+                if desc[i].text.find('Процентная ставка') >= 0:
+                    percent = value[i].text;
+                if desc[i].text.find('Срок кредита') >= 0:
+                    term = value[i].text;
+
+            data = [1, 'Infinbank', title.text, percent, term, '']
+            writer.writerow(data)
+
+            print()
+
+    # close the file
+    f.close()
+
+
 
     # res1=driver.get(url)
     # button = driver.find_element_by_class_name("slide-out-btn")
