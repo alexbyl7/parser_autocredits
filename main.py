@@ -13,7 +13,7 @@ if __name__ == '__main__':
     for s in d:
         data.append(s)
 
-    print(data)
+    # print(data)
 
     excel.export_xls(headers, data)
 

@@ -1,26 +1,6 @@
-import requests
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-import time
 
-import excel
+import html_loader
 
-
-def get_html_requests(url):
-     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
-     r = requests.get(url)
-     return r.text
-
-def get_html_webdriver(url):
-    options = Options()
-    options.headless = True
-    driver = webdriver.Firefox(options=options)
-    driver.get(url)
-    time.sleep(1)
-    html = driver.page_source
-    driver.close()
-    return html
 
 def parse_ipakyulibank():
     print("Parse Ipakyuli Bank")
@@ -29,8 +9,7 @@ def parse_ipakyulibank():
     # url = 'https://kapital24.uz/ru/crediting/calc_auto.php?MODEL=&dev=&CALC_TYPE=CALC&LOAN_AMOUNT=133%2C288%2C572&LOAN_AMOUNT_RANGE=133%2C288%2C572&LOAN_LENGTH=36&LOAN_LENGTH_RANGE=36&LOAN_PERCENT=24.00&lang=ru&one=1&percent=1&collateralTypeId=1'
     url = 'https://ru.ipakyulibank.uz/physical/kredity/avtokredit/spark'
 
-    html = get_html_webdriver(url)
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = html_loader.get_soup(url)
 
     res = soup.find_all(class_='flex lg4 xs12')
     # print(res)
@@ -48,16 +27,7 @@ def parse_kapital24():
 
     url = 'https://kapital24.uz/ru/crediting/udobnoe-avto-udobnaya-karta/'
     # url = 'https://kapital24.uz/ru/crediting/calc_auto.php?MODEL=&dev=&CALC_TYPE=CALC&LOAN_AMOUNT=133%2C288%2C572&LOAN_AMOUNT_RANGE=133%2C288%2C572&LOAN_LENGTH=36&LOAN_LENGTH_RANGE=36&LOAN_PERCENT=24.00&lang=ru&one=1&percent=1&collateralTypeId=1'
-
-    # driver = webdriver.Firefox()
-    # driver.get(url)
-    # # TODO: выставить параметры через драйвер
-    # time.sleep(1)
-    # html = driver.page_source
-    # driver.close()
-
-    html = get_html_webdriver(url)
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = html_loader.get_soup(url)
 
     res = soup.find_all('div')
     # print(res)
@@ -73,8 +43,7 @@ def parse_infinbank():
     print('Парсим сайт Infinbank...', '\n')
 
     url = 'https://www.infinbank.com/ru/private/credits/'
-    html = get_html_webdriver(url)
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = html_loader.get_soup(url)
 
     cont = soup.find_all('div', class_='g-container')
 
@@ -103,6 +72,3 @@ def parse_infinbank():
             print()
 
     return data
-
-    # excel.export_xls(headers, data)
-    # excel.export_csv(headers, data)
